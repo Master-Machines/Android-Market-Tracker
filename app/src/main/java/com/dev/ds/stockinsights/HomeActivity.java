@@ -19,8 +19,7 @@ import android.view.MenuItem;
 import com.dev.ds.stockinsights.adapters.StockListAdapter;
 
 public class HomeActivity extends AppCompatActivity implements StockListAdapter.StockSelectionInterface {
-    private static final long MOVE_DEFAULT_TIME = 1000;
-    private static final long FADE_DEFAULT_TIME = 300;
+    private static final long FADE_DEFAULT_TIME = 250;
 
     public StockViewModel stockViewModel;
     private FloatingActionButton fab;
@@ -104,15 +103,9 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
         StockDetailsFragment detailsFragment = StockDetailsFragment.newInstance(symbol);
         detailsFragment.setViewModel(this.stockViewModel);
         fragmentTransaction.replace(R.id.home_fragment_container, detailsFragment);
-//        fragmentTransaction.setTransition()
         fragmentTransaction.addToBackStack(null);
 
 
-//        TransitionSet enterTransitionSet = new TransitionSet();
-//        enterTransitionSet.addTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
-//        enterTransitionSet.setDuration(MOVE_DEFAULT_TIME);
-//        enterTransitionSet.setStartDelay(FADE_DEFAULT_TIME);
-//        detailsFragment.setSharedElementEnterTransition(enterTransitionSet);
 
         Fade enterFade = new Fade();
         enterFade.setDuration(FADE_DEFAULT_TIME);

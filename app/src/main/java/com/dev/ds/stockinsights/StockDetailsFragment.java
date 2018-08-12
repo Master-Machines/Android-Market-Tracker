@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dev.ds.stockinsights.adapters.StockDetailAdapter;
-import com.dev.ds.stockinsights.models.Quote;
 
 
 /**
@@ -69,8 +68,8 @@ public class StockDetailsFragment extends Fragment {
 
     public void setViewModel(StockViewModel viewModel) {
         this.stockViewModel = viewModel;
-        this.detailAdapter = new StockDetailAdapter(getContext());
-        this.detailAdapter.setDataset(viewModel.activeQuote.getInfoItems());
+        this.detailAdapter = new StockDetailAdapter(this);
+        this.detailAdapter.setStockDetails(viewModel.activeQuote);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
