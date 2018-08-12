@@ -15,8 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.ViewHolder> {
+    public interface StockSelectionInterface {
+        void stockSelected(String symbol);
+    }
+
+
     private List<Quote> dataset;
     private Context context;
+    public StockSelectionInterface stockSelectionDelegate;
 
     public StockListAdapter(Context context) {
         this.dataset = new ArrayList<Quote>();
@@ -25,7 +31,7 @@ public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.View
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
+        public View v;
         public TextView companyTextView;
         public TextView tickerTextView;
         public TextView priceTextView;
@@ -33,10 +39,19 @@ public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.View
 
         public ViewHolder(View v) {
             super(v);
+            this.v = v;
             tickerTextView = v.findViewById(R.id.ticker_name);
             companyTextView = v.findViewById(R.id.stock_name);
             priceTextView = v.findViewById(R.id.stock_price);
             percentChangeTextView = v.findViewById(R.id.percent_change);
+        }
+
+        public void setupClickListener(final Quote quote, final StockSelectionInterface stockSelectionDelegate) {
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    stockSelectionDelegate.stockSelected(quote.symbol);
+                }
+            });
         }
     }
 
@@ -71,6 +86,8 @@ public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.View
         } else {
             holder.percentChangeTextView.setText("--- ");
         }
+
+        holder.setupClickListener(quote, stockSelectionDelegate);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

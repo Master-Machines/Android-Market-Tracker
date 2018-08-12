@@ -2,6 +2,9 @@ package com.dev.ds.stockinsights.models;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Quote {
 
     @Expose
@@ -76,5 +79,45 @@ public class Quote {
     public double week52Low;
     @Expose
     public double ytdChange;
+
+
+    public List<QuoteInfoItem> getInfoItems() {
+        List<QuoteInfoItem> items = new ArrayList<QuoteInfoItem>();
+
+        items.add(new QuoteInfoItem("Open", getFormattedPriceString(open)));
+        items.add(new QuoteInfoItem("Close", getFormattedPriceString(close)));
+        items.add(new QuoteInfoItem("Prev Close", getFormattedPriceString(previousClose)));
+        items.add(new QuoteInfoItem("52 Week Low", getFormattedPriceString(week52Low)));
+        items.add(new QuoteInfoItem("52 Week High", getFormattedPriceString(week52High)));
+        items.add(new QuoteInfoItem("ytd change", getFormattedPercentString(ytdChange)));
+        items.add(new QuoteInfoItem("Market Cap", "$" + Long.toString(marketCap)));
+        items.add(new QuoteInfoItem("Sector", sector));
+        items.add(new QuoteInfoItem("Exchange", primaryExchange));
+        items.add(new QuoteInfoItem("Extended Price", getFormattedPriceString(extendedPrice)));
+
+        return items;
+    }
+
+    private String getFormattedPriceString(double price) {
+        return String.format("$%.2f", price);
+    }
+
+    private String getFormattedPercentString(double percent) {
+        percent *= 100;
+        if (percent > 0) {
+            return String.format("+%.2f%%", percent);
+        }
+        return String.format("%.2f%%", percent);
+    }
+
+    public class QuoteInfoItem {
+        public String title;
+        public String val;
+
+        public QuoteInfoItem(String title, String val) {
+            this.title = title;
+            this.val = val;
+        }
+    }
 
 }

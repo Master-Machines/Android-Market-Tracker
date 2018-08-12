@@ -18,6 +18,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class StockViewModel {
 
+    public Quote activeQuote;
     public List<Quote> quoteList;
     public StockListAdapter adapter;
 
@@ -47,6 +48,14 @@ public class StockViewModel {
             public void onComplete() {
             }
         });
+    }
+
+    public void setActiveQuote(String symbol) {
+        for(Quote quote: this.quoteList) {
+            if (quote.symbol.equals(symbol)) {
+                this.activeQuote = quote;
+            }
+        }
     }
 
 }
