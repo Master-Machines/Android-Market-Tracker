@@ -2,11 +2,8 @@ package com.dev.ds.stockinsights;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.transition.Fade;
-import android.support.transition.TransitionInflater;
-import android.support.transition.TransitionSet;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -17,10 +14,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.dev.ds.stockinsights.adapters.StockListAdapter;
+import com.dev.ds.stockinsights.adapters.StockSearchAdapter;
+import com.dev.ds.stockinsights.dialogs.StockSearchDialog;
+import com.dev.ds.stockinsights.models.QuoteInfo;
 
-public class HomeActivity extends AppCompatActivity implements StockListAdapter.StockSelectionInterface {
+import io.reactivex.observers.DisposableObserver;
+
+public class HomeActivity extends AppCompatActivity implements StockListAdapter.StockSelectionInterface, StockSearchAdapter.StockSelectionInterface {
     private static final long FADE_DEFAULT_TIME = 250;
 
+    private StockSearchDialog searchFragment;
     public StockViewModel stockViewModel;
     private FloatingActionButton fab;
 
@@ -31,11 +34,13 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
 
         stockViewModel = new StockViewModel(this);
         stockViewModel.adapter.stockSelectionDelegate = this;
-        stockViewModel.getStockQuote("TSLA");
-        stockViewModel.getStockQuote("SNAP");
-        stockViewModel.getStockQuote("VTI");
-        stockViewModel.getStockQuote("TTWO");
-        stockViewModel.getStockQuote("AAPL");
+        stockViewModel.getStockQuote("TSLA", null);
+        stockViewModel.getStockQuote("SNAP", null);
+        stockViewModel.getStockQuote("VTI", null);
+        stockViewModel.getStockQuote("TTWO", null);
+        stockViewModel.getStockQuote("AAPL", null);
+
+        stockViewModel.retrieveAllSymbols();
 
 //        HomeActivityFragment homeFragment = (HomeActivityFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_home);
 //        homeFragment.setViewModel(stockViewModel);
@@ -49,8 +54,7 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showSearchDialog();
             }
         });
 
@@ -95,6 +99,15 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
         homeFragment.setExitTransition(exitFade);
     }
 
+    private void showSearchDialog() {
+        searchFragment = new StockSearchDialog();
+        searchFragment.setViewModel(stockViewModel);
+        searchFragment.searchAdapter.stockSearchSelectionDelegate = this;
+        searchFragment.setShowsDialog(true);
+        searchFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+        searchFragment.show(getSupportFragmentManager(), "dialog");
+    }
+
     @Override
     public void stockSelected(String symbol) {
         this.stockViewModel.setActiveQuote(symbol);
@@ -115,4 +128,15 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
         fragmentTransaction.commit();
     }
 
+
+    @Override
+    public void stockSelectedFromSearch(String symbol) {
+        stockViewModel.getStockQuote(symbol, new Runnable() {
+            @Override
+            public void run() {
+                getSupportFragmentManager().beginTransaction().remove(searchFragment).commit();
+                stockSelected(symbol);
+            }
+        });
+    }
 }
