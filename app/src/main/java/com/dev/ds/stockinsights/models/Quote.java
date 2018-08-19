@@ -98,11 +98,14 @@ public class Quote {
         return items;
     }
 
-    private String getFormattedPriceString(double price) {
+    public static String getFormattedPriceString(double price) {
+        if (price < 0) {
+            return String.format("-$%.2f", -price);
+        }
         return String.format("$%.2f", price);
     }
 
-    private String getFormattedPercentString(double percent) {
+    public static String getFormattedPercentString(double percent) {
         percent *= 100;
         if (percent > 0) {
             return String.format("+%.2f%%", percent);
