@@ -18,6 +18,8 @@ import com.dev.ds.stockinsights.adapters.StockSearchAdapter;
 import com.dev.ds.stockinsights.dialogs.StockSearchDialog;
 import com.dev.ds.stockinsights.models.QuoteInfo;
 
+import java.util.HashSet;
+
 import io.reactivex.observers.DisposableObserver;
 
 public class HomeActivity extends AppCompatActivity implements StockListAdapter.StockSelectionInterface, StockSearchAdapter.StockSelectionInterface {
@@ -34,11 +36,6 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
 
         stockViewModel = new StockViewModel(this);
         stockViewModel.adapter.stockSelectionDelegate = this;
-        stockViewModel.getStockQuote("TSLA", null);
-        stockViewModel.getStockQuote("SNAP", null);
-        stockViewModel.getStockQuote("VTI", null);
-        stockViewModel.getStockQuote("TTWO", null);
-        stockViewModel.getStockQuote("AAPL", null);
 
         stockViewModel.retrieveAllSymbols();
 
@@ -82,6 +79,8 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void startHomeFragment() {
         HomeActivityFragment homeFragment = new HomeActivityFragment();

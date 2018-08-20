@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dev.ds.stockinsights.R;
+import com.dev.ds.stockinsights.SymbolFollowerManager;
 import com.dev.ds.stockinsights.models.Quote;
 
 import java.util.ArrayList;
@@ -102,7 +103,19 @@ public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.View
     }
 
     public void addQuote(Quote quote) {
-        this.dataset.add(quote);
-        this.notifyDataSetChanged();
+        if (SymbolFollowerManager.getInstance().isSymbolFollowed(quote.symbol, context)) {
+            boolean alreadyHasQuote = false;
+            for (Quote q : dataset) {
+                if (q.symbol.equals(quote.symbol)) {
+                    q = quote;
+                    alreadyHasQuote = true;
+                }
+            }
+
+            if (!alreadyHasQuote) {
+                this.dataset.add(quote);
+            }
+            this.notifyDataSetChanged();
+        }
     }
 }

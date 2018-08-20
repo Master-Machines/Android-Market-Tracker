@@ -7,4 +7,6 @@
     <color name="greenStock">#007F3F</color>
     <color name="redStock">#FF0033</color>
     <color name="dialogBackground">#AAAAAAAA</color>
+    <color name="transparentDark">#33FFFFFF</color>
+    <color name="white">#FFFFFF</color>
 </resources>

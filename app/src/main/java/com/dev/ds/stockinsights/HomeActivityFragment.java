@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import com.dev.ds.stockinsights.adapters.StockListAdapter;
 
+import java.util.HashSet;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -41,10 +43,23 @@ public class HomeActivityFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getFollowedSymbols();
+    }
+
     public void setViewModel(StockViewModel viewModel) {
         this.stockViewModel = viewModel;
         if(recyclerView != null) {
             recyclerView.setAdapter(stockViewModel.adapter);
+        }
+    }
+
+    private void getFollowedSymbols() {
+        HashSet<String> followedSymbols = SymbolFollowerManager.getInstance().getFollowedSymbols(getContext());
+        for (String symbol: followedSymbols) {
+            this.stockViewModel.getStockQuote(symbol, null);
         }
     }
 }
