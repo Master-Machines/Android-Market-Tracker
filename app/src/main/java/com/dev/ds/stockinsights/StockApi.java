@@ -1,5 +1,6 @@
 package com.dev.ds.stockinsights;
 
+import com.dev.ds.stockinsights.models.Logo;
 import com.dev.ds.stockinsights.models.Quote;
 import com.dev.ds.stockinsights.models.QuoteInfo;
 import com.dev.ds.stockinsights.models.Symbol;
@@ -17,5 +18,8 @@ public interface StockApi {
 
     @GET("ref-data/symbols")
     Observable<Symbol[]> getAllSymbols();
+
+    @GET("stock/{symbol}/logo")
+    Observable<Logo> getLogo(@Path("symbol") String symbol);
 
 }

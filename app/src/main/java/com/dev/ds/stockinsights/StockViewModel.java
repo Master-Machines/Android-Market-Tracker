@@ -1,8 +1,10 @@
 package com.dev.ds.stockinsights;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.dev.ds.stockinsights.adapters.StockListAdapter;
+import com.dev.ds.stockinsights.models.Logo;
 import com.dev.ds.stockinsights.models.Quote;
 import com.dev.ds.stockinsights.models.QuoteInfo;
 import com.dev.ds.stockinsights.models.Symbol;
@@ -12,6 +14,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -21,11 +24,13 @@ public class StockViewModel {
 
     public Quote activeQuote;
     public List<Quote> quoteList;
+    public List<Logo> logoList;
     public StockListAdapter adapter;
     public Symbol[] allSymbols;
 
     public StockViewModel(Context context) {
         quoteList = new ArrayList<Quote>();
+        logoList = new ArrayList<Logo>();
         adapter = new StockListAdapter(context);
     }
 
@@ -78,5 +83,37 @@ public class StockViewModel {
             }
         }
     }
+
+    public Logo getCachedLogo(String symbol) {
+        for (Logo logo: logoList) {
+            if (logo.symbol.equals(symbol)) {
+                return logo;
+            }
+        }
+        return null;
+    }
+
+    public Observable<Logo> retrieveLogo(String symbol) {
+        Observable<Logo> logoObservable = StockService.getInstance().getStockApi().getLogo(symbol);
+
+        Disposable disposable = logoObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new  DisposableObserver<Logo>() {
+
+                    @Override
+                    public void onNext(Logo logo) {
+                        logo.symbol = symbol;
+                        logoList.add(logo);
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+                    @Override
+                    public void onComplete() { }
+                });
+        return logoObservable;
+    }
+
+
 
 }

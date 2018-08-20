@@ -21,11 +21,13 @@ public class StockSearchDialog extends DialogFragment {
     public StockSearchAdapter searchAdapter;
     private RecyclerView recyclerView;
     private TextInputEditText textInputEditText;
+    private View loadingView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_stock_search, container, false);
 
+        loadingView = v.findViewById(R.id.loading_spinner);
         recyclerView = v.findViewById(R.id.search_results_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(searchAdapter);
@@ -56,6 +58,11 @@ public class StockSearchDialog extends DialogFragment {
     public void setViewModel(StockViewModel stockViewModel) {
         this.stockViewModel = stockViewModel;
         this.searchAdapter = new StockSearchAdapter(this, this.stockViewModel.allSymbols);
+    }
+
+    public void ShowLoadingAnimation() {
+        loadingView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
     }
 
 }

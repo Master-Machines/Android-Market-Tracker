@@ -7,13 +7,24 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.dev.ds.stockinsights.R;
+import com.dev.ds.stockinsights.models.Logo;
 import com.dev.ds.stockinsights.models.Quote;
 
 import java.util.ArrayList;
 import java.util.List;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class StockDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_HEADER = 0;
@@ -21,11 +32,29 @@ public class StockDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<Quote.QuoteInfoItem> dataset;
     private Quote currentQuote;
     private Fragment parentFragment;
+    private HeaderViewHolder headerViewHolder;
     public StockListAdapter.StockSelectionInterface stockSelectionDelegate;
+    public PublishSubject<Logo> imageUrlObservable;
 
     public StockDetailAdapter(Fragment parentFragment) {
         this.dataset = new ArrayList<Quote.QuoteInfoItem>();
         this.parentFragment = parentFragment;
+
+        imageUrlObservable = PublishSubject.create();
+
+        Disposable disposable = imageUrlObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new  DisposableObserver<Logo>() {
+
+                    @Override
+                    public void onNext(Logo logo) {
+                        Glide.with(parentFragment).load(logo.url).into(headerViewHolder.imageView);
+                    }
+                    @Override
+                    public void onError(Throwable e) { }
+                    @Override
+                    public void onComplete() { }
+                });
     }
 
 
@@ -48,6 +77,7 @@ public class StockDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public TextView tickerTextView;
         public TextView priceTextView;
         public TextView percentChangeTextView;
+        public ImageView imageView;
 
         public HeaderViewHolder(View v) {
             super(v);
@@ -56,6 +86,7 @@ public class StockDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             companyTextView = v.findViewById(R.id.stock_name);
             priceTextView = v.findViewById(R.id.stock_price);
             percentChangeTextView = v.findViewById(R.id.percent_change);
+            imageView = v.findViewById(R.id.logo_view);
         }
     }
 
@@ -66,10 +97,10 @@ public class StockDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (viewType == VIEW_TYPE_HEADER) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.stock_ticker_cell, parent, false);
+                    .inflate(R.layout.stock_details_header, parent, false);
 
-            StockDetailAdapter.HeaderViewHolder vh = new StockDetailAdapter.HeaderViewHolder(v);
-            return (RecyclerView.ViewHolder) vh;
+            headerViewHolder = new StockDetailAdapter.HeaderViewHolder(v);
+            return (RecyclerView.ViewHolder) headerViewHolder;
         } else {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.stock_details_cell, parent, false);

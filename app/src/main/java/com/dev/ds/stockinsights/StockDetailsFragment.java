@@ -11,6 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dev.ds.stockinsights.adapters.StockDetailAdapter;
+import com.dev.ds.stockinsights.models.Logo;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -61,6 +68,29 @@ public class StockDetailsFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(this.detailAdapter);
+
+        Logo logo = stockViewModel.getCachedLogo(stockSymbol);
+        if (logo == null) {
+            Observable<Logo> logoObservable = stockViewModel.retrieveLogo(stockSymbol);
+            Disposable disposable = logoObservable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new  DisposableObserver<Logo>() {
+
+                        @Override
+                        public void onNext(Logo logo) {
+                            if(logo != null) {
+                                detailAdapter.imageUrlObservable.onNext(logo);
+                            }
+                        }
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+                        @Override
+                        public void onComplete() { }
+                    });
+        } else {
+            detailAdapter.imageUrlObservable.onNext(logo);
+        }
 
         // Inflate the layout for this fragment
         return rootView;

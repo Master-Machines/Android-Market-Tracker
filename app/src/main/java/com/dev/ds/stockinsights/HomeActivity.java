@@ -21,7 +21,7 @@ import com.dev.ds.stockinsights.models.QuoteInfo;
 import io.reactivex.observers.DisposableObserver;
 
 public class HomeActivity extends AppCompatActivity implements StockListAdapter.StockSelectionInterface, StockSearchAdapter.StockSelectionInterface {
-    private static final long FADE_DEFAULT_TIME = 250;
+    private static final long FADE_DEFAULT_TIME = 400;
 
     private StockSearchDialog searchFragment;
     public StockViewModel stockViewModel;
@@ -106,6 +106,10 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
         searchFragment.setShowsDialog(true);
         searchFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         searchFragment.show(getSupportFragmentManager(), "dialog");
+
+        Fade exitFade = new Fade();
+        exitFade.setDuration(FADE_DEFAULT_TIME);
+        searchFragment.setExitTransition(exitFade);
     }
 
     @Override
@@ -131,6 +135,7 @@ public class HomeActivity extends AppCompatActivity implements StockListAdapter.
 
     @Override
     public void stockSelectedFromSearch(String symbol) {
+        searchFragment.ShowLoadingAnimation();
         stockViewModel.getStockQuote(symbol, new Runnable() {
             @Override
             public void run() {
